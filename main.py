@@ -1,53 +1,54 @@
 import tkinter as tk
 from tkinter import ttk
-from table import create_periodic_table, load_elements, update_periodic_table_with_gradient
+from element_details import load_elements
+from table import create_periodic_table, update_periodic_table_with_ionization_energy, update_periodic_table_with_gradient
 
 
 def main():
     elements = load_elements('data/elements.json')
-    
-    # Create the main window
+
     root = tk.Tk()
     root.title('Periodic Table')
-    root.geometry('1290x750')  # Set the window size
+    root.geometry('1290x750')
     root.resizable(False, False)
 
-    # Create a main frame to organize the layout
     main_frame = ttk.Frame(root)
     main_frame.pack(fill='both', expand=True)
 
-    # Create the table frame for the periodic table
     table_frame = ttk.Frame(main_frame)
     table_frame.pack(side='top', fill='both', expand=True, padx=20, pady=20)
 
-    # Create the periodic table in the table frame
     create_periodic_table(table_frame, elements)
 
-    # Variable to track current state (True for gradient, False for default)
-    is_gradient_view = tk.BooleanVar(value=False)
+    selected_trend = tk.StringVar(value="default")
 
-    # Function to toggle between views
-    def toggle_view():
-        if is_gradient_view.get():
-            # Reset to default view
+    def apply_gradient():
+        trend = selected_trend.get()
+        if trend == "default":
             create_periodic_table(table_frame, elements)
-            toggle_button.config(text="Show Electronegativity Gradient")
-            is_gradient_view.set(False)
+        elif trend == "ionization_energy":
+            update_periodic_table_with_ionization_energy(table_frame, elements)
         else:
-            # Apply gradient view
-            update_periodic_table_with_gradient(table_frame, elements)
-            toggle_button.config(text="Reset to Default View")
-            is_gradient_view.set(True)
+            update_periodic_table_with_gradient(table_frame, elements, trend)
 
-    # Add the toggle button at the bottom of the main frame
-    toggle_button = ttk.Button(
+    trend_menu = ttk.OptionMenu(
         main_frame,
-        text="Show Electronegativity Gradient",
-        command=toggle_view
+        selected_trend,
+        "default",
+        "default",
+        "electronegativity",
+        "electron_affinity",
+        "ionization_energy", 
     )
-    toggle_button.pack(side='bottom', pady=10)
+    trend_menu.pack(side='left', padx=10, pady=10)
 
-    # Start the main GUI loop
+    apply_button = ttk.Button(
+        main_frame,
+        text="Apply Gradient",
+        command=apply_gradient
+    )
+    apply_button.pack(side='left', padx=10, pady=10)
+
     root.mainloop()
 
 

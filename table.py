@@ -1,7 +1,7 @@
 import json
 import tkinter as tk
 from tkinter import ttk
-from element_details import add_electronegativity_gradient, calculate_color_gradient, get_contrasting_text_color
+from element_details import add_electronegativity_gradient, calculate_color_gradient, get_contrasting_text_color, add_ionization_energy_gradient, add_electron_affinity_gradient
 
 def load_elements(file_path):
     with open(file_path, 'r') as file:
@@ -29,8 +29,11 @@ def create_periodic_table(table_frame, elements):
         button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
 
 
-def update_periodic_table_with_gradient(table_frame, elements):
-    add_electronegativity_gradient(elements)
+def update_periodic_table_with_gradient(table_frame, elements, trend="electronegativity"):
+    if trend == "electronegativity":
+        add_electronegativity_gradient(elements)
+    elif trend == "electron_affinity":
+        add_electron_affinity_gradient(elements)
 
     for button, element in zip(table_frame.winfo_children(), elements):
         color = element.get("color", "#ffffff")
@@ -59,6 +62,49 @@ def update_periodic_table_with_gradient(table_frame, elements):
         text_color = get_contrasting_text_color(color)
         
         style_name = f"{element['symbol']}.TButton"
+        style = ttk.Style()
+        style.configure(
+            style_name,
+            background=color,
+            foreground=text_color,
+            relief="flat",
+            width=6,
+            anchor="center",
+            padding=2,
+        )
+
+        button = ttk.Button(
+            table_frame,
+            text=f"{element['symbol']}\n{element['number']}\n{element['atomic_mass']:.2f}",
+            style=style_name,
+            command=lambda e=element: show_element_details(e),
+        )
+        button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
+
+def update_periodic_table_with_ionization_energy(table_frame, elements):
+    add_ionization_energy_gradient(elements)
+
+    for widget in table_frame.winfo_children():
+        widget.destroy()
+
+    ionization_energies = [
+        element["ionization_energies"][0] if "ionization_energies" in element and element["ionization_energies"] else None
+        for element in elements
+    ]
+    ionization_energies = [e for e in ionization_energies if e is not None]
+    min_ionization = min(ionization_energies)
+    max_ionization = max(ionization_energies)
+
+    for element in elements:
+        ionization_energy = element["ionization_energies"][0] if "ionization_energies" in element and element["ionization_energies"] else None
+        color = (
+            calculate_color_gradient(min_ionization, max_ionization, ionization_energy)
+            if ionization_energy is not None
+            else "#ffffff"
+        )
+        text_color = get_contrasting_text_color(color)
+
+        style_name = f"{element['symbol']}_ionization.TButton"
         style = ttk.Style()
         style.configure(
             style_name,

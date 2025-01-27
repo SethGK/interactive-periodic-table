@@ -44,6 +44,46 @@ def add_electronegativity_gradient(elements):
             color = "#ffffff"  # Default to white if no electronegativity
         element["color"] = color
 
+def add_ionization_energy_gradient(elements):
+    ionization_energies = [
+        element["ionization_energies"][0] if "ionization_energies" in element and element["ionization_energies"] else None
+        for element in elements
+    ]
+
+    ionization_energies = [e for e in ionization_energies if e is not None]
+    min_ionization = min(ionization_energies)
+    max_ionization = max(ionization_energies)
+
+    for element in elements:
+        if "ionization_energies" in element and element["ionization_energies"]:
+            ionization_energy = element["ionization_energies"][0]
+            color = calculate_color_gradient(
+                min_ionization, max_ionization, ionization_energy
+            )
+        else:
+            color = "#ffffff"  # Default to white if no ionization energy
+        element["ionization_color"] = color
+
+
+def add_electron_affinity_gradient(elements):
+    electron_affinities = [
+        element["electron_affinity"]
+        for element in elements
+        if element["electron_affinity"] is not None
+    ]
+
+    min_electron_affinity = min(electron_affinities)
+    max_electron_affinity = max(electron_affinities)
+
+    for element in elements:
+        electron_affinity = element.get("electron_affinity")
+        if electron_affinity is not None:
+            color = calculate_color_gradient(
+                min_electron_affinity, max_electron_affinity, electron_affinity
+            )
+        else:
+            color = "#ffffff"  # Default to white if no electron affinity
+        element["color"] = color
 
 
            
