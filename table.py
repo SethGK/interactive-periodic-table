@@ -1,7 +1,7 @@
 import json
 import tkinter as tk
 from tkinter import ttk
-from element_details import add_electronegativity_gradient
+from element_details import add_electronegativity_gradient, calculate_color_gradient, get_contrasting_text_color
 
 def load_elements(file_path):
     with open(file_path, 'r') as file:
@@ -46,15 +46,24 @@ def update_periodic_table_with_gradient(table_frame, elements):
     for widget in table_frame.winfo_children():
         widget.destroy() 
 
+    electronegativities = [e['electronegativity_pauling'] for e in elements if e['electronegativity_pauling'] is not None]
+    min_electronegativity = min(electronegativities)
+    max_electronegativity = max(electronegativities)
+
     for element in elements:
         electronegativity = element.get('electronegativity_pauling')
-        color = element.get('color', "#ffffff") 
+        color = (calculate_color_gradient(min_electronegativity, max_electronegativity, electronegativity) 
+        if electronegativity is not None 
+        else '#ffffff')
 
+        text_color = get_contrasting_text_color(color)
+        
         style_name = f"{element['symbol']}.TButton"
         style = ttk.Style()
         style.configure(
             style_name,
             background=color,
+            foreground=text_color,
             relief="flat",
             width=6,
             anchor="center",
