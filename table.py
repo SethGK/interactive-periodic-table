@@ -1,22 +1,74 @@
 import json
 import tkinter as tk
 from tkinter import ttk
+from element_details import add_electronegativity_gradient
 
 def load_elements(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
     return data["elements"]
 
-def create_periodic_table(root, elements):
-    table_frame = ttk.Frame(root)
-    table_frame.pack(fill='both', expand=True, padx=20, pady=20)
+def create_periodic_table(table_frame, elements):
+    default_style = ttk.Style()
+    default_style.configure(
+        "Default.TButton",
+        background="#ffffff",
+        relief="flat",
+        width=6,
+        anchor="center",
+        padding=2,
+    )
 
     for element in elements:
-        button = ttk.Button(table_frame, 
-                            text=f"{element['symbol']}\n{element['number']}", 
-                            width=5, 
-                            command=lambda e=element: show_element_details(e))
+        button = ttk.Button(
+            table_frame,
+            text=f"{element['symbol']}\n{element['number']}\n{element['atomic_mass']:.2f}",
+            style="Default.TButton",
+            command=lambda e=element: show_element_details(e),
+        )
         button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
+
+
+def update_periodic_table_with_gradient(table_frame, elements):
+    add_electronegativity_gradient(elements)
+
+    for button, element in zip(table_frame.winfo_children(), elements):
+        color = element.get("color", "#ffffff")
+        style_name = f"{element['symbol']}.TButton"
+
+        style = ttk.Style()
+        style.configure(style_name, background=color, relief="flat")
+
+        
+        button.configure(style=style_name)
+
+
+    for widget in table_frame.winfo_children():
+        widget.destroy() 
+
+    for element in elements:
+        electronegativity = element.get('electronegativity_pauling')
+        color = element.get('color', "#ffffff") 
+
+        style_name = f"{element['symbol']}.TButton"
+        style = ttk.Style()
+        style.configure(
+            style_name,
+            background=color,
+            relief="flat",
+            width=6,
+            anchor="center",
+            padding=2,
+        )
+
+        button = ttk.Button(
+            table_frame,
+            text=f"{element['symbol']}\n{element['number']}\n{element['atomic_mass']:.2f}",
+            style=style_name,
+            command=lambda e=element: show_element_details(e),
+        )
+        button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
+
 
 def show_element_details(element):
     details_window = tk.Toplevel()
