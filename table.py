@@ -1,7 +1,7 @@
 import json
 import tkinter as tk
 from tkinter import ttk
-from element_details import add_electronegativity_gradient, calculate_color_gradient, get_contrasting_text_color, add_ionization_energy_gradient, add_electron_affinity_gradient
+from element_details import *
 
 def load_elements(file_path):
     with open(file_path, 'r') as file:
@@ -34,6 +34,8 @@ def update_periodic_table_with_gradient(table_frame, elements, trend="electroneg
         add_electronegativity_gradient(elements)
     elif trend == "electron_affinity":
         add_electron_affinity_gradient(elements)
+
+    
 
     for button, element in zip(table_frame.winfo_children(), elements):
         color = element.get("color", "#ffffff")
@@ -128,36 +130,59 @@ def update_periodic_table_with_ionization_energy(table_frame, elements):
 def show_element_details(element):
     details_window = tk.Toplevel()
     details_window.title(element['name'])
-    details_window.geometry('400x300')
+    details_window.geometry('400x500')
 
-    symbol_label = ttk.Label(details_window, text=f"Symbol: {element['symbol']}")
-    symbol_label.pack(pady=10)
-
-    name_label = ttk.Label(details_window, text=f"Name: {element['name']}")
-    name_label.pack(pady=10)
-
-    atomic_mass_label = ttk.Label(details_window, text=f"Atomic Mass: {element['atomic_mass']}")
-    atomic_mass_label.pack(pady=10)
-
-    discovered_by_label = ttk.Label(details_window, text=f"Discovered By: {element['discovered_by']}")
-    discovered_by_label.pack(pady=10)
 
     frame = ttk.Frame(details_window)
-    frame.pack(fill='both', expand=True, padx=10, pady=5)
+    frame.pack(fill='both', expand=True, padx=10, pady=10)
 
     canvas = tk.Canvas(frame)
+    canvas.pack(side='left', fill='both', expand=True)
+
     scrollbar = ttk.Scrollbar(frame, orient='vertical', command=canvas.yview)
+    scrollbar.pack(side='right', fill='y')
+
     inner_frame = ttk.Frame(canvas)
 
     inner_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
-
     canvas.create_window((0, 0), window=inner_frame, anchor='nw')
+
     canvas.configure(yscrollcommand=scrollbar.set)
 
-    canvas.pack(side='left', fill='both', expand=True)
-    scrollbar.pack(side='right', fill='y')
-    
-    summary_label = ttk.Label(inner_frame, text=element['summary'], wraplength=350, justify='left', font=('Arial', 10))
-    summary_label.pack(anchor='w', padx = 5)
+    basic_info = [
+        f"Symbol: {element['symbol']}",
+        f"Name: {element['name']}",
+        f"Atomic Number: {element['number']}",
+        f"Category: {element['category']}",
+        f"Phase: {element['phase']}",
+        f"Atomic Mass: {element['atomic_mass']}",
+        f"Density: {element.get('density', 'Unknown')} g/cm³",
+        f"Molar Heat: {element.get('molar_heat', 'Unknown')} J/(mol·K)",
+        f"Discovered By: {element.get('discovered_by', 'Unknown')}",
+    ]
+    for info in basic_info:
+        label = ttk.Label(inner_frame, text=info, wraplength=350, justify='left', font=('Arial', 10))
+        label.pack(anchor='w', pady=2)
+
+    ttk.Label(inner_frame, text="Electron Configuration:", font=('Arial', 10, 'bold')).pack(anchor='w', pady=5)
+    ttk.Label(inner_frame, text=element['electron_configuration'], wraplength=350, justify='left').pack(anchor='w')
+
+    if 'electron_affinity' in element:
+        ttk.Label(inner_frame, text=f"Electron Affinity: {element['electron_affinity']} kJ/mol").pack(anchor='w')
+
+    if 'electronegativity_pauling' in element:
+        ttk.Label(inner_frame, text=f"Electronegativity (Pauling): {element['electronegativity_pauling']}").pack(anchor='w')
+
+    if 'melt' in element and 'boil' in element:
+        ttk.Label(inner_frame, text=f"Melting Point: {element['melt']} K").pack(anchor='w')
+        ttk.Label(inner_frame, text=f"Boiling Point: {element['boil']} K").pack(anchor='w')
+
+
+    ttk.Label(inner_frame, text="Summary:", font=('Arial', 10, 'bold')).pack(anchor='w', pady=5)
+    ttk.Label(inner_frame, text=element['summary'], wraplength=350, justify='left').pack(anchor='w')
+
+
+
+
     
 

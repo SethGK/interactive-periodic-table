@@ -86,6 +86,6 @@ def add_electron_affinity_gradient(elements):
         element["color"] = color
 
 
-           
+
 
     

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from element_details import load_elements
-from table import create_periodic_table, update_periodic_table_with_ionization_energy, update_periodic_table_with_gradient
+from element_details import *
+from table import *
 
 
 def main():
