@@ -16,14 +16,19 @@ def main():
     table_frame = ttk.Frame(main_frame)
     table_frame.pack(side='top', fill='both', expand=True, padx=20, pady=20)
 
-    create_periodic_table(table_frame, elements)
+    legend_frame = ttk.Frame(main_frame)
+    legend_frame.pack(side="bottom", fill="x", pady=10)
+    add_legend(legend_frame)
+
+
+    create_periodic_table_with_blocks(table_frame, elements)
 
     selected_trend = tk.StringVar(value="default")
 
     def apply_gradient():
         trend = selected_trend.get()
         if trend == "default":
-            create_periodic_table(table_frame, elements)
+            create_periodic_table_with_blocks(table_frame, elements)
         elif trend == "ionization_energy":
             update_periodic_table_with_ionization_energy(table_frame, elements)
         else:

@@ -8,29 +8,51 @@ def load_elements(file_path):
         data = json.load(file)
     return data["elements"]
 
-def create_periodic_table(table_frame, elements):
-    default_style = ttk.Style()
-    default_style.configure(
-        "Default.TButton",
-        background="#ffffff",
-        relief="flat",
-        width=6,
-        anchor="center",
-        padding=2,
-    )
-
+def create_periodic_table_with_blocks(table_frame, elements):
+    BLOCK_COLORS = {
+    "s": "#ff9999",  # Light red for s-block
+    "p": "#99ccff",  # Light blue for p-block
+    "d": "#99ff99",  # Light green for d-block
+    "f": "#ffcc99"   # Light orange for f-block
+    }
     for widget in table_frame.winfo_children():
         widget.destroy()
 
     for element in elements:
+        block = element.get("block", "s")
+        color = BLOCK_COLORS.get(block, "#ffffff") 
+        text_color = get_contrasting_text_color(color)
+
+        style_name = f"{element['symbol']}.TButton"
+        style = ttk.Style()
+        style.configure(
+            style_name,
+            background=color,
+            foreground=text_color,
+            relief="flat",
+            width=6,
+            anchor="center",
+            padding=2,
+        )
+
         button = ttk.Button(
             table_frame,
             text=f"{element['symbol']}\n{element['number']}\n{element['atomic_mass']:.2f}",
-            style="Default.TButton",
+            style=style_name,
             command=lambda e=element: show_element_details(e),
         )
         button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
 
+def add_legend(frame):
+    BLOCK_COLORS = {
+    "s": "#ff9999",  # Light red for s-block
+    "p": "#99ccff",  # Light blue for p-block
+    "d": "#99ff99",  # Light green for d-block
+    "f": "#ffcc99"   # Light orange for f-block
+    }
+    for block, color in BLOCK_COLORS.items():
+        label = ttk.Label(frame, text=f"{block}-block", background=color, width=10, anchor="center")
+        label.pack(side="left", padx=5, pady=5)
 
 
 def update_periodic_table_with_gradient(table_frame, elements, trend="electronegativity"):
