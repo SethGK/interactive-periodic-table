@@ -1,4 +1,4 @@
-# Interactive Periodic Table 
+# Interactive Periodic Table
 
 Built in python with tkinter
 
