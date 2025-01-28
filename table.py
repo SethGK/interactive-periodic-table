@@ -19,6 +19,9 @@ def create_periodic_table(table_frame, elements):
         padding=2,
     )
 
+    for widget in table_frame.winfo_children():
+        widget.destroy()
+
     for element in elements:
         button = ttk.Button(
             table_frame,
@@ -29,40 +32,17 @@ def create_periodic_table(table_frame, elements):
         button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
 
 
+
 def update_periodic_table_with_gradient(table_frame, elements, trend="electronegativity"):
     if trend == "electronegativity":
         add_electronegativity_gradient(elements)
     elif trend == "electron_affinity":
         add_electron_affinity_gradient(elements)
 
-    
-
     for button, element in zip(table_frame.winfo_children(), elements):
         color = element.get("color", "#ffffff")
-        style_name = f"{element['symbol']}.TButton"
-
-        style = ttk.Style()
-        style.configure(style_name, background=color, relief="flat")
-
-        
-        button.configure(style=style_name)
-
-
-    for widget in table_frame.winfo_children():
-        widget.destroy() 
-
-    electronegativities = [e['electronegativity_pauling'] for e in elements if e['electronegativity_pauling'] is not None]
-    min_electronegativity = min(electronegativities)
-    max_electronegativity = max(electronegativities)
-
-    for element in elements:
-        electronegativity = element.get('electronegativity_pauling')
-        color = (calculate_color_gradient(min_electronegativity, max_electronegativity, electronegativity) 
-        if electronegativity is not None 
-        else '#ffffff')
-
         text_color = get_contrasting_text_color(color)
-        
+
         style_name = f"{element['symbol']}.TButton"
         style = ttk.Style()
         style.configure(
@@ -75,13 +55,8 @@ def update_periodic_table_with_gradient(table_frame, elements, trend="electroneg
             padding=2,
         )
 
-        button = ttk.Button(
-            table_frame,
-            text=f"{element['symbol']}\n{element['number']}\n{element['atomic_mass']:.2f}",
-            style=style_name,
-            command=lambda e=element: show_element_details(e),
-        )
-        button.grid(row=element['ypos'], column=element['xpos'] - 1, padx=2, pady=2)
+        button.configure(style=style_name)
+
 
 def update_periodic_table_with_ionization_energy(table_frame, elements):
     add_ionization_energy_gradient(elements)

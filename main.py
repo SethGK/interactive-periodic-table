@@ -3,14 +3,12 @@ from tkinter import ttk
 from element_details import *
 from table import *
 
-
 def main():
     elements = load_elements('data/elements.json')
 
     root = tk.Tk()
     root.title('Periodic Table')
-    root.geometry('1290x750')
-    root.resizable(False, False)
+    root.resizable(True, True)
 
     main_frame = ttk.Frame(root)
     main_frame.pack(fill='both', expand=True)
@@ -38,7 +36,7 @@ def main():
         "default",
         "electronegativity",
         "electron_affinity",
-        "ionization_energy", 
+        "ionization_energy",
     )
     trend_menu.pack(side='left', padx=10, pady=10)
 
@@ -49,7 +47,13 @@ def main():
     )
     apply_button.pack(side='left', padx=10, pady=10)
 
+    root.update_idletasks()
+    width = table_frame.winfo_reqwidth() + 50
+    height = table_frame.winfo_reqheight() + 150 
+    root.geometry(f"{width}x{height}")
+
     root.mainloop()
+
 
 
 if __name__ == '__main__':
